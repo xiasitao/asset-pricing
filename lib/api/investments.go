@@ -20,7 +20,7 @@ func (pvs *InvestmentsServer) ServeHTTP(responseWriter http.ResponseWriter, requ
 
 func (pvs *InvestmentsServer) route(responseWriter http.ResponseWriter, request *http.Request) {
 	subPath := strings.TrimPrefix(request.URL.Path, UrlPrefix)
-	if strings.HasPrefix(subPath, "/general-present-value") {
+	if subPath == "/" {
 		pvs.handleGeneralPresentValue(responseWriter, request)
 	} else {
 		pvs.handleUnknownPath(responseWriter, request)
@@ -48,6 +48,7 @@ type GeneralPresentValueResponseBody struct {
 func (pvs *InvestmentsServer) handleGeneralPresentValue(responseWriter http.ResponseWriter, request *http.Request) {
 	if request.Method != http.MethodPost {
 		pvs.handleInappropriateMethod(responseWriter)
+		return
 	}
 	var body GeneralPresentValueRequestBody
 	err := ReadRequestBody(&body, responseWriter, request)

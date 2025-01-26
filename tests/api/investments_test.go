@@ -25,6 +25,8 @@ func mockCalculateGeneralPresentValue(...i.Period) i.CurrencyUnit {
 	return mockPresentValue
 }
 
+const generalPresentValueEndpoint = "/"
+
 func TestInvestmentsServer(t *testing.T) {
 	t.Run("test unknown path", func(t *testing.T) {
 		request, responseWriter := postRequestResponseWriterFactory(a.UrlPrefix+"/unknown-path", "")
@@ -35,9 +37,10 @@ func TestInvestmentsServer(t *testing.T) {
 }
 
 func TestPresentValueWithMock(t *testing.T) {
+
 	t.Run("test correct request", func(t *testing.T) {
 		request, responseWriter := postRequestResponseWriterFactory(
-			a.UrlPrefix+"/general-present-value",
+			a.UrlPrefix+generalPresentValueEndpoint,
 			"{\"periods\": [{\"cashflow\": 1.0, \"interest\": 1.0}]}",
 		)
 		server := &a.InvestmentsServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
@@ -49,14 +52,14 @@ func TestPresentValueWithMock(t *testing.T) {
 	})
 
 	t.Run("test malformed request body", func(t *testing.T) {
-		request, responseWriter := postRequestResponseWriterFactory(a.UrlPrefix+"/general-present-value", "{malformed}")
+		request, responseWriter := postRequestResponseWriterFactory(a.UrlPrefix+generalPresentValueEndpoint, "{malformed}")
 		server := &a.InvestmentsServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
 		server.ServeHTTP(responseWriter, request)
 		assertStatus(t, responseWriter, http.StatusUnprocessableEntity)
 	})
 
 	t.Run("test wrong method", func(t *testing.T) {
-		request, _ := http.NewRequest(http.MethodGet, a.UrlPrefix+"/general-present-value", strings.NewReader(""))
+		request, _ := http.NewRequest(http.MethodGet, a.UrlPrefix+generalPresentValueEndpoint, strings.NewReader(""))
 		responseWriter := httptest.NewRecorder()
 		server := &a.InvestmentsServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
 		server.ServeHTTP(responseWriter, request)
@@ -68,7 +71,7 @@ func TestPresentValueWithMock(t *testing.T) {
 func TestPresentValueIntegration(t *testing.T) {
 	server := a.ProductionInvestmentsServer
 	request, responseWriter := postRequestResponseWriterFactory(
-		a.UrlPrefix+"/general-present-value",
+		a.UrlPrefix+generalPresentValueEndpoint,
 		"{\"periods\": [{\"cashflow\": 1.0, \"interest\": 1.0}]}",
 	)
 	server.ServeHTTP(responseWriter, request)
