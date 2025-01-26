@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-const UrlPrefix = "/api/asset-pricing"
+const UrlPrefix = ""
 
 func ReadRequestBody(body *GeneralPresentValueRequestBody, responseWriter http.ResponseWriter, request *http.Request) error {
 	err := json.NewDecoder(request.Body).Decode(&body)

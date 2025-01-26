@@ -25,7 +25,7 @@ func mockCalculateGeneralPresentValue(...i.Period) i.CurrencyUnit {
 	return mockPresentValue
 }
 
-const generalPresentValueEndpoint = "/"
+const generalPresentValueEndpoint = "/general-present-value"
 
 func TestInvestmentsServer(t *testing.T) {
 	t.Run("test unknown path", func(t *testing.T) {

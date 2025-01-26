@@ -20,7 +20,7 @@ func (pvs *InvestmentsServer) ServeHTTP(responseWriter http.ResponseWriter, requ
 
 func (pvs *InvestmentsServer) route(responseWriter http.ResponseWriter, request *http.Request) {
 	subPath := strings.TrimPrefix(request.URL.Path, UrlPrefix)
-	if subPath == "/" {
+	if subPath == "/general-present-value" {
 		pvs.handleGeneralPresentValue(responseWriter, request)
 	} else {
 		pvs.handleUnknownPath(responseWriter, request)
