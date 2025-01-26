@@ -14,7 +14,7 @@
   },
   "customHandler": {
     "description": {
-      "defaultExecutablePath": "../dist/asset-pricing",
+      "defaultExecutablePath": "dist/asset-pricing",
       "workingDirectory": "",
       "arguments": []
     },
