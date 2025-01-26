@@ -3,8 +3,8 @@ package investments
 type CurrencyUnit float64
 
 type Period struct {
-	Cashflow CurrencyUnit
-	Interest float64
+	Cashflow CurrencyUnit `json:"cashflow"`
+	Interest float64      `json:"interest"`
 }
 
 func CalculatePresentValue(periods ...Period) CurrencyUnit {

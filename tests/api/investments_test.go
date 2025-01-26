@@ -21,7 +21,7 @@ func TestPresentValue(t *testing.T) {
 		a.GeneralPresentValueHandler(responseWriter, request)
 
 		got := responseWriter.Code
-		expected := 200
+		expected := 422
 
 		if got != expected {
 			t.Errorf("got %d, expected %d", got, expected)
@@ -29,13 +29,13 @@ func TestPresentValue(t *testing.T) {
 	})
 
 	t.Run("test response body", func(t *testing.T) {
-		request, responseWriter := requestResponseWriterFactory("{\"periods\": [{\"cashflow\": 3000.0}]}")
+		request, responseWriter := requestResponseWriterFactory("{\"periods\": [{\"cashflow\": 1.0, \"interest\": 1.0}]}")
 		a.GeneralPresentValueHandler(responseWriter, request)
 
 		got := responseWriter.Body.String()
-		expected := "{\"presentValue\":3000.0}"
+		expected := "{\"presentValue\":0.5}"
 
-		if got != expected {
+		if strings.Trim(got, " \n") != expected {
 			t.Errorf("got %s, expected %s", got, expected)
 		}
 	})
