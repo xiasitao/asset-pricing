@@ -8,9 +8,9 @@ import (
 )
 
 func TestPresentValue(t *testing.T) {
-	assertPresentValue := func(t testing.TB, got, expected float64) {
+	assertPresentValue := func(t testing.TB, got, expected i.CurrencyUnit) {
 		t.Helper()
-		toFixedString := func(value float64) string {
+		toFixedString := func(value i.CurrencyUnit) string {
 			return fmt.Sprintf("%.8f", value)
 		}
 		if toFixedString(got) != toFixedString(expected) {
@@ -61,7 +61,7 @@ func TestPresentValue(t *testing.T) {
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
 			got := i.CalculatePresentValue(test.periods...)
-			assertPresentValue(t, got, test.expected)
+			assertPresentValue(t, got, i.CurrencyUnit(test.expected))
 		})
 	}
 }
