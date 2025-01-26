@@ -8,7 +8,9 @@ import (
 )
 
 func main() {
-	http.Handle(api.UrlPrefix, &api.ProductionInvestmentsServer)
+	router := http.NewServeMux()
+	router.Handle(api.UrlPrefix+"/", &api.ProductionInvestmentsServer)
+	http.Handle("/", router)
 	http.ListenAndServe(getListenAddress(), nil)
 }
 

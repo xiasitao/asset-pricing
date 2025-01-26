@@ -27,10 +27,8 @@ func (pvs *InvestmentsServer) route(responseWriter http.ResponseWriter, request 
 	}
 }
 
-func (pvs *InvestmentsServer) handleInappropriateMethod(responseWriter http.ResponseWriter, request *http.Request) {
-	method := request.Method
+func (pvs *InvestmentsServer) handleInappropriateMethod(responseWriter http.ResponseWriter) {
 	responseWriter.WriteHeader(http.StatusMethodNotAllowed)
-	responseWriter.Write([]byte(fmt.Sprintf("method not allowed %q", method)))
 }
 
 func (pvs *InvestmentsServer) handleUnknownPath(responseWriter http.ResponseWriter, request *http.Request) {
@@ -49,7 +47,7 @@ type GeneralPresentValueResponseBody struct {
 
 func (pvs *InvestmentsServer) handleGeneralPresentValue(responseWriter http.ResponseWriter, request *http.Request) {
 	if request.Method != http.MethodPost {
-		pvs.handleInappropriateMethod(responseWriter, request)
+		pvs.handleInappropriateMethod(responseWriter)
 	}
 	var body GeneralPresentValueRequestBody
 	err := ReadRequestBody(&body, responseWriter, request)
