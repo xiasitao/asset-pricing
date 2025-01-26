@@ -32,14 +32,6 @@ func TestInvestmentsServer(t *testing.T) {
 		server.ServeHTTP(responseWriter, request)
 		assertStatus(t, responseWriter, http.StatusNotFound)
 	})
-
-	t.Run("test wrong method", func(t *testing.T) {
-		request, _ := http.NewRequest(http.MethodGet, "/", strings.NewReader(""))
-		responseWriter := httptest.NewRecorder()
-		server := &a.InvestmentsServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
-		server.ServeHTTP(responseWriter, request)
-		assertStatus(t, responseWriter, http.StatusMethodNotAllowed)
-	})
 }
 
 func TestPresentValueWithMock(t *testing.T) {
@@ -62,6 +54,14 @@ func TestPresentValueWithMock(t *testing.T) {
 		server := &a.InvestmentsServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
 		server.ServeHTTP(responseWriter, request)
 		assertStatus(t, responseWriter, http.StatusUnprocessableEntity)
+	})
+
+	t.Run("test wrong method", func(t *testing.T) {
+		request, _ := http.NewRequest(http.MethodGet, "/general-present-value", strings.NewReader(""))
+		responseWriter := httptest.NewRecorder()
+		server := &a.InvestmentsServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
+		server.ServeHTTP(responseWriter, request)
+		assertStatus(t, responseWriter, http.StatusMethodNotAllowed)
 	})
 
 }
