@@ -16,8 +16,8 @@ func requestResponseWriterFactory(requestBody string) (request *http.Request, re
 }
 
 func TestPresentValue(t *testing.T) {
-	t.Run("test response code", func(t *testing.T) {
-		request, responseWriter := requestResponseWriterFactory("")
+	t.Run("test malformed request body", func(t *testing.T) {
+		request, responseWriter := requestResponseWriterFactory("{malformed}")
 		a.GeneralPresentValueHandler(responseWriter, request)
 
 		got := responseWriter.Code
@@ -28,7 +28,7 @@ func TestPresentValue(t *testing.T) {
 		}
 	})
 
-	t.Run("test response body", func(t *testing.T) {
+	t.Run("test correct request", func(t *testing.T) {
 		request, responseWriter := requestResponseWriterFactory(
 			"{\"periods\": [{\"cashflow\": 1.0, \"interest\": 1.0}]}",
 		)
