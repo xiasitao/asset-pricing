@@ -8,7 +8,8 @@ import (
 )
 
 func main() {
-	http.ListenAndServe(getListenAddress(), &api.ProductionInvestmentsServer)
+	http.Handle(api.UrlPrefix, &api.ProductionInvestmentsServer)
+	http.ListenAndServe(getListenAddress(), nil)
 }
 
 func getListenAddress() string {
