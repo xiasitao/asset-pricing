@@ -10,7 +10,7 @@ import (
 )
 
 func requestResponseWriterFactory(requestBody string) (request *http.Request, responseWriter *httptest.ResponseRecorder) {
-	request, _ = http.NewRequest(http.MethodGet, "/", strings.NewReader(requestBody))
+	request, _ = http.NewRequest(http.MethodPost, "/", strings.NewReader(requestBody))
 	responseWriter = httptest.NewRecorder()
 	return
 }
