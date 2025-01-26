@@ -16,7 +16,7 @@ func requestResponseWriterFactory(path string, body string) (request *http.Reque
 	return
 }
 
-func mockCalcuateGeneralPresentValue(...i.Period) i.CurrencyUnit {
+func mockCalculateGeneralPresentValue(...i.Period) i.CurrencyUnit {
 	return 123.5
 }
 
@@ -28,7 +28,7 @@ func TestPresentValue(t *testing.T) {
 			"/general-present-value",
 			"{\"periods\": [{\"cashflow\": 1.0, \"interest\": 1.0}]}",
 		)
-		server := &a.PresentValueServer{CalculateGeneralPresentValue: mockCalcuateGeneralPresentValue}
+		server := &a.PresentValueServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
 		server.ServeHTTP(responseWriter, request)
 
 		got := responseWriter.Body.String()
@@ -41,11 +41,24 @@ func TestPresentValue(t *testing.T) {
 
 	t.Run("test malformed request body", func(t *testing.T) {
 		request, responseWriter := requestResponseWriterFactory("/general-present-value", "{malformed}")
-		server := &a.PresentValueServer{CalculateGeneralPresentValue: mockCalcuateGeneralPresentValue}
+		server := &a.PresentValueServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
 		server.ServeHTTP(responseWriter, request)
 
 		got := responseWriter.Code
 		expected := 422
+
+		if got != expected {
+			t.Errorf("got %d, expected %d", got, expected)
+		}
+	})
+
+	t.Run("test unknown path", func(t *testing.T) {
+		request, responseWriter := requestResponseWriterFactory("/unknown-path", "")
+		server := &a.PresentValueServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
+		server.ServeHTTP(responseWriter, request)
+
+		got := responseWriter.Code
+		expected := 404
 
 		if got != expected {
 			t.Errorf("got %d, expected %d", got, expected)
