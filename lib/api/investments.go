@@ -18,6 +18,9 @@ func (pvs *InvestmentsServer) ServeHTTP(responseWriter http.ResponseWriter, requ
 
 func (pvs *InvestmentsServer) route(responseWriter http.ResponseWriter, request *http.Request) {
 	path := request.URL.Path
+	if request.Method != http.MethodPost {
+		pvs.handleInappropriateMethod(responseWriter, request)
+	}
 	if strings.HasPrefix(path, "/general-present-value") {
 		pvs.handleGeneralPresentValue(responseWriter, request)
 	} else {
@@ -25,9 +28,15 @@ func (pvs *InvestmentsServer) route(responseWriter http.ResponseWriter, request 
 	}
 }
 
+func (pvs *InvestmentsServer) handleInappropriateMethod(responseWriter http.ResponseWriter, request *http.Request) {
+	method := request.Method
+	responseWriter.WriteHeader(http.StatusMethodNotAllowed)
+	responseWriter.Write([]byte(fmt.Sprintf("method not allowed %q", method)))
+}
+
 func (pvs *InvestmentsServer) handleUnknownPath(responseWriter http.ResponseWriter, request *http.Request) {
 	path := request.URL.Path
-	responseWriter.WriteHeader(404)
+	responseWriter.WriteHeader(http.StatusNotFound)
 	responseWriter.Write([]byte(fmt.Sprintf("unknown path %q", path)))
 }
 

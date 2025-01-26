@@ -10,7 +10,7 @@ import (
 	i "xiasitao.de/asset-pricing/lib/investments"
 )
 
-func requestResponseWriterFactory(path string, body string) (request *http.Request, responseWriter *httptest.ResponseRecorder) {
+func postRequestResponseWriterFactory(path string, body string) (request *http.Request, responseWriter *httptest.ResponseRecorder) {
 	request, _ = http.NewRequest(http.MethodPost, path, strings.NewReader(body))
 	responseWriter = httptest.NewRecorder()
 	return
@@ -24,16 +24,24 @@ const expectedResponseFromMockCalculateGeneratePresentValue = "{\"presentValue\"
 
 func TestInvestmentsServer(t *testing.T) {
 	t.Run("test unknown path", func(t *testing.T) {
-		request, responseWriter := requestResponseWriterFactory("/unknown-path", "")
+		request, responseWriter := postRequestResponseWriterFactory("/unknown-path", "")
 		server := &a.InvestmentsServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
 		server.ServeHTTP(responseWriter, request)
 		assertStatus(t, responseWriter, http.StatusNotFound)
 	})
-}
-func TestPresentValue(t *testing.T) {
 
+	t.Run("test wrong method", func(t *testing.T) {
+		request, _ := http.NewRequest(http.MethodGet, "/", strings.NewReader(""))
+		responseWriter := httptest.NewRecorder()
+		server := &a.InvestmentsServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
+		server.ServeHTTP(responseWriter, request)
+		assertStatus(t, responseWriter, http.StatusMethodNotAllowed)
+	})
+}
+
+func TestPresentValue(t *testing.T) {
 	t.Run("test correct request", func(t *testing.T) {
-		request, responseWriter := requestResponseWriterFactory(
+		request, responseWriter := postRequestResponseWriterFactory(
 			"/general-present-value",
 			"{\"periods\": [{\"cashflow\": 1.0, \"interest\": 1.0}]}",
 		)
@@ -49,7 +57,7 @@ func TestPresentValue(t *testing.T) {
 	})
 
 	t.Run("test malformed request body", func(t *testing.T) {
-		request, responseWriter := requestResponseWriterFactory("/general-present-value", "{malformed}")
+		request, responseWriter := postRequestResponseWriterFactory("/general-present-value", "{malformed}")
 		server := &a.InvestmentsServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
 		server.ServeHTTP(responseWriter, request)
 		assertStatus(t, responseWriter, http.StatusUnprocessableEntity)
