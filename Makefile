@@ -2,9 +2,9 @@
 build:
 	@mkdir -p dist
 	@go build -o dist/asset-pricing main.go
-	@cp -a dist deployment
+	@cp -a dist deployment/azure-functions
 
 install-azure-tools-apt:
-	@sh deployment/azure-scripts/install_azure_function_tools_apt.sh
+	@sh deployment/azure-functions/azure-scripts/install_azure_function_tools_apt.sh
 
 .PHONY: build install-azure-tools-apt
