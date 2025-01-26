@@ -12,6 +12,8 @@ type InvestmentsServer struct {
 	CalculateGeneralPresentValue func(...i.Period) i.CurrencyUnit
 }
 
+var ProductionInvestmentsServer = InvestmentsServer{CalculateGeneralPresentValue: i.CalculatePresentValue}
+
 func (pvs *InvestmentsServer) ServeHTTP(responseWriter http.ResponseWriter, request *http.Request) {
 	pvs.route(responseWriter, request)
 }

@@ -4,10 +4,8 @@ import (
 	"net/http"
 
 	"xiasitao.de/asset-pricing/lib/api"
-	"xiasitao.de/asset-pricing/lib/investments"
 )
 
 func main() {
-	presentValueServer := api.InvestmentsServer{CalculateGeneralPresentValue: investments.CalculatePresentValue}
-	http.ListenAndServe(":8000", &presentValueServer)
+	http.ListenAndServe(":8000", &api.ProductionInvestmentsServer)
 }
