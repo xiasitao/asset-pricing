@@ -13,3 +13,7 @@ func ReadRequestBody(body *GeneralPresentValueRequestBody, responseWriter http.R
 	}
 	return err
 }
+
+func WriteResponseBody(responseWriter http.ResponseWriter, value any) {
+	json.NewEncoder(responseWriter).Encode(value)
+}

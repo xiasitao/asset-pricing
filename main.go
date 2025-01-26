@@ -8,6 +8,6 @@ import (
 )
 
 func main() {
-	presentValueServer := api.PresentValueServer{CalculateGeneralPresentValue: investments.CalculatePresentValue}
+	presentValueServer := api.InvestmentsServer{CalculateGeneralPresentValue: investments.CalculatePresentValue}
 	http.ListenAndServe(":8000", &presentValueServer)
 }

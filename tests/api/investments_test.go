@@ -28,7 +28,7 @@ func TestPresentValue(t *testing.T) {
 			"/general-present-value",
 			"{\"periods\": [{\"cashflow\": 1.0, \"interest\": 1.0}]}",
 		)
-		server := &a.PresentValueServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
+		server := &a.InvestmentsServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
 		server.ServeHTTP(responseWriter, request)
 
 		got := responseWriter.Body.String()
@@ -41,7 +41,7 @@ func TestPresentValue(t *testing.T) {
 
 	t.Run("test malformed request body", func(t *testing.T) {
 		request, responseWriter := requestResponseWriterFactory("/general-present-value", "{malformed}")
-		server := &a.PresentValueServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
+		server := &a.InvestmentsServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
 		server.ServeHTTP(responseWriter, request)
 
 		got := responseWriter.Code
@@ -54,7 +54,7 @@ func TestPresentValue(t *testing.T) {
 
 	t.Run("test unknown path", func(t *testing.T) {
 		request, responseWriter := requestResponseWriterFactory("/unknown-path", "")
-		server := &a.PresentValueServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
+		server := &a.InvestmentsServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
 		server.ServeHTTP(responseWriter, request)
 
 		got := responseWriter.Code

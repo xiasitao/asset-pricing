@@ -1,39 +1,34 @@
 package api
 
 import (
-	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
 	i "xiasitao.de/asset-pricing/lib/investments"
 )
 
-type PresentValueServer struct {
+type InvestmentsServer struct {
 	CalculateGeneralPresentValue func(...i.Period) i.CurrencyUnit
 }
 
-func (pvs *PresentValueServer) ServeHTTP(responseWriter http.ResponseWriter, request *http.Request) {
+func (pvs *InvestmentsServer) ServeHTTP(responseWriter http.ResponseWriter, request *http.Request) {
 	pvs.route(responseWriter, request)
 }
 
-func (pvs *PresentValueServer) route(responseWriter http.ResponseWriter, request *http.Request) {
+func (pvs *InvestmentsServer) route(responseWriter http.ResponseWriter, request *http.Request) {
 	path := request.URL.Path
 	if strings.HasPrefix(path, "/general-present-value") {
 		pvs.handleGeneralPresentValue(responseWriter, request)
 	} else {
-
+		pvs.handleUnknownPath(responseWriter, request)
 	}
 }
 
-func (pvs *PresentValueServer) handleGeneralPresentValue(responseWriter http.ResponseWriter, request *http.Request) {
-	var body GeneralPresentValueRequestBody
-	err := ReadRequestBody(&body, responseWriter, request)
-	if err != nil {
-		return
-	}
-
-	presentValue := pvs.CalculateGeneralPresentValue(body.Periods...)
-	json.NewEncoder(responseWriter).Encode(GeneralPresentValueResponseBody{presentValue})
+func (pvs *InvestmentsServer) handleUnknownPath(responseWriter http.ResponseWriter, request *http.Request) {
+	path := request.URL.Path
+	responseWriter.WriteHeader(404)
+	responseWriter.Write([]byte(fmt.Sprintf("unknown path %q", path)))
 }
 
 type GeneralPresentValueRequestBody struct {
@@ -42,4 +37,14 @@ type GeneralPresentValueRequestBody struct {
 
 type GeneralPresentValueResponseBody struct {
 	PresentValue i.CurrencyUnit `json:"presentValue"`
+}
+
+func (pvs *InvestmentsServer) handleGeneralPresentValue(responseWriter http.ResponseWriter, request *http.Request) {
+	var body GeneralPresentValueRequestBody
+	err := ReadRequestBody(&body, responseWriter, request)
+	if err != nil {
+		return
+	}
+	presentValue := pvs.CalculateGeneralPresentValue(body.Periods...)
+	WriteResponseBody(responseWriter, GeneralPresentValueResponseBody{presentValue})
 }
