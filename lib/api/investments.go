@@ -7,22 +7,18 @@ import (
 	i "xiasitao.de/asset-pricing/lib/investments"
 )
 
-type GeneralPresentValueRequestBody struct {
-	Periods []i.Period `json:"periods"`
+type PresentValueServer struct {
+	CalculateGeneralPresentValue func(...i.Period) i.CurrencyUnit
 }
 
-type GeneralPresentValueResponseBody struct {
-	PresentValue i.CurrencyUnit `json:"presentValue"`
-}
-
-func GeneralPresentValueHandler(responseWriter http.ResponseWriter, request *http.Request) {
+func (pvs *PresentValueServer) ServeHTTP(responseWriter http.ResponseWriter, request *http.Request) {
 	var body GeneralPresentValueRequestBody
 	err := readRequestBody(&body, responseWriter, request)
 	if err != nil {
 		return
 	}
 
-	presentValue := i.CalculatePresentValue(body.Periods...)
+	presentValue := pvs.CalculateGeneralPresentValue(body.Periods...)
 	json.NewEncoder(responseWriter).Encode(GeneralPresentValueResponseBody{presentValue})
 }
 
@@ -33,4 +29,12 @@ func readRequestBody(body *GeneralPresentValueRequestBody, responseWriter http.R
 		responseWriter.Write([]byte(err.Error()))
 	}
 	return err
+}
+
+type GeneralPresentValueRequestBody struct {
+	Periods []i.Period `json:"periods"`
+}
+
+type GeneralPresentValueResponseBody struct {
+	PresentValue i.CurrencyUnit `json:"presentValue"`
 }

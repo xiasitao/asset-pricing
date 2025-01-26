@@ -4,8 +4,10 @@ import (
 	"net/http"
 
 	"xiasitao.de/asset-pricing/lib/api"
+	"xiasitao.de/asset-pricing/lib/investments"
 )
 
 func main() {
-	http.ListenAndServe(":8000", http.HandlerFunc(api.GeneralPresentValueHandler))
+	presentValueServer := api.PresentValueServer{CalculateGeneralPresentValue: investments.CalculatePresentValue}
+	http.ListenAndServe(":8000", &presentValueServer)
 }

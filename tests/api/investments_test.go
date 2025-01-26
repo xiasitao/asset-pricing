@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	a "xiasitao.de/asset-pricing/lib/api"
+	i "xiasitao.de/asset-pricing/lib/investments"
 )
 
 func requestResponseWriterFactory(requestBody string) (request *http.Request, responseWriter *httptest.ResponseRecorder) {
@@ -15,30 +16,38 @@ func requestResponseWriterFactory(requestBody string) (request *http.Request, re
 	return
 }
 
+func mockCalcuateGeneralPresentValue(...i.Period) i.CurrencyUnit {
+	return 123.5
+}
+
+const expectedResponseFromMockCalculateGeneratePresentValue = "{\"presentValue\":123.5}"
+
 func TestPresentValue(t *testing.T) {
+	t.Run("test correct request", func(t *testing.T) {
+		request, responseWriter := requestResponseWriterFactory(
+			"{\"periods\": [{\"cashflow\": 1.0, \"interest\": 1.0}]}",
+		)
+		server := &a.PresentValueServer{CalculateGeneralPresentValue: mockCalcuateGeneralPresentValue}
+		server.ServeHTTP(responseWriter, request)
+
+		got := responseWriter.Body.String()
+		expected := expectedResponseFromMockCalculateGeneratePresentValue
+
+		if strings.Trim(got, " \n") != expected {
+			t.Errorf("got %s, expected %s", got, expected)
+		}
+	})
+
 	t.Run("test malformed request body", func(t *testing.T) {
 		request, responseWriter := requestResponseWriterFactory("{malformed}")
-		a.GeneralPresentValueHandler(responseWriter, request)
+		server := &a.PresentValueServer{CalculateGeneralPresentValue: mockCalcuateGeneralPresentValue}
+		server.ServeHTTP(responseWriter, request)
 
 		got := responseWriter.Code
 		expected := 422
 
 		if got != expected {
 			t.Errorf("got %d, expected %d", got, expected)
-		}
-	})
-
-	t.Run("test correct request", func(t *testing.T) {
-		request, responseWriter := requestResponseWriterFactory(
-			"{\"periods\": [{\"cashflow\": 1.0, \"interest\": 1.0}]}",
-		)
-		a.GeneralPresentValueHandler(responseWriter, request)
-
-		got := responseWriter.Body.String()
-		expected := "{\"presentValue\":0.5}"
-
-		if strings.Trim(got, " \n") != expected {
-			t.Errorf("got %s, expected %s", got, expected)
 		}
 	})
 
