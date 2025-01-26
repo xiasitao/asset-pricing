@@ -1,5 +1,5 @@
-FROM golang:1.23
-WORKDIR /api
+FROM golang:1.23 AS build
+WORKDIR /dist
 
 # dependencies
 COPY go.mod ./
@@ -8,7 +8,10 @@ RUN go mod download
 # compile
 COPY main.go ./
 COPY lib lib
-RUN mkdir -p dist &&  CGO_ENABLED=0 GOOS=linux go build -o dist/asset-pricing
+RUN CGO_ENABLED=0 GOOS=linux go build -o app.bin
 
 # entrypoint
-ENTRYPOINT [ "dist/asset-pricing" ]
+FROM golang:1.23 AS run
+WORKDIR /app
+COPY --from=build /dist/app.bin .
+ENTRYPOINT [ "./app.bin" ]
