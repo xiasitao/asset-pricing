@@ -1,7 +1,6 @@
 build:
 	@mkdir -p dist
 	@go build -o dist/asset-pricing main.go
-	@cp -a dist deployment/azure-functions
 
 run:
 	@cd deployment/docker-compose && docker compose up --build
