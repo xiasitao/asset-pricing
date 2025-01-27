@@ -1,9 +1,10 @@
+name: asset-pricing
 services:
   api:
     image: asset-pricing-api
     container_name: asset-pricing-api
     build:
-      context: .
+      context: ../../
     ports:
       - 8080:8080
     environment:
