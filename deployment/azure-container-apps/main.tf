@@ -9,7 +9,7 @@ terraform {
     resource_group_name  = "tfstate"
     storage_account_name = "tfstatexiasitao"
     container_name       = "tfstate"
-    key                  = "asset-pricing-dev.tfstate"
+    key                  = "asset-pricing-dev-containerapps.tfstate"
   }
 }
 
@@ -19,7 +19,7 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "resource_group" {
-  name     = "asset-pricing-dev"
+  name     = "asset-pricing-dev-containerapps"
   location = "germanywestcentral"
 }
 
