@@ -9,9 +9,8 @@ import (
 )
 
 func main() {
-	router := http.NewServeMux()
-	router.Handle(api.UrlPrefix+"/", &api.ProductionInvestmentsServer)
-	http.ListenAndServe(getListenAddress(), router)
+	server := api.NewAssetPricingServer(&api.ProductionInvestmentsRouter)
+	http.ListenAndServe(getListenAddress(), server)
 }
 
 func getListenAddress() string {

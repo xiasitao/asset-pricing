@@ -1,41 +1,26 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
-	"strings"
 
 	i "xiasitao.de/asset-pricing/lib/investments"
 )
 
-type InvestmentsServer struct {
+type InvestmentsRouter struct {
 	CalculateGeneralPresentValue func(...i.Period) i.CurrencyUnit
+	http.Handler
 }
 
-var ProductionInvestmentsServer = InvestmentsServer{CalculateGeneralPresentValue: i.CalculatePresentValue}
-
-func (pvs *InvestmentsServer) ServeHTTP(responseWriter http.ResponseWriter, request *http.Request) {
-	pvs.route(responseWriter, request)
+func NewInvestmentsRouter(calculateGeneralPresentValue func(...i.Period) i.CurrencyUnit) *InvestmentsRouter {
+	router := new(InvestmentsRouter)
+	router.CalculateGeneralPresentValue = calculateGeneralPresentValue
+	mux := http.NewServeMux()
+	mux.HandleFunc("/general-present-value", router.handleGeneralPresentValue)
+	router.Handler = mux
+	return router
 }
 
-func (pvs *InvestmentsServer) route(responseWriter http.ResponseWriter, request *http.Request) {
-	subPath := strings.TrimPrefix(request.URL.Path, UrlPrefix)
-	if subPath == "/general-present-value" {
-		pvs.handleGeneralPresentValue(responseWriter, request)
-	} else {
-		pvs.handleUnknownPath(responseWriter, request)
-	}
-}
-
-func (pvs *InvestmentsServer) handleInappropriateMethod(responseWriter http.ResponseWriter) {
-	responseWriter.WriteHeader(http.StatusMethodNotAllowed)
-}
-
-func (pvs *InvestmentsServer) handleUnknownPath(responseWriter http.ResponseWriter, request *http.Request) {
-	path := request.URL.Path
-	responseWriter.WriteHeader(http.StatusNotFound)
-	responseWriter.Write([]byte(fmt.Sprintf("unknown path %q", path)))
-}
+var ProductionInvestmentsRouter = NewInvestmentsRouter(i.CalculatePresentValue)
 
 type GeneralPresentValueRequestBody struct {
 	Periods []i.Period `json:"periods"`
@@ -45,9 +30,9 @@ type GeneralPresentValueResponseBody struct {
 	PresentValue i.CurrencyUnit `json:"presentValue"`
 }
 
-func (pvs *InvestmentsServer) handleGeneralPresentValue(responseWriter http.ResponseWriter, request *http.Request) {
+func (pvs *InvestmentsRouter) handleGeneralPresentValue(responseWriter http.ResponseWriter, request *http.Request) {
 	if request.Method != http.MethodPost {
-		pvs.handleInappropriateMethod(responseWriter)
+		responseWriter.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 	var body GeneralPresentValueRequestBody

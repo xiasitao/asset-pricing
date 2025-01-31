@@ -27,11 +27,11 @@ func mockCalculateGeneralPresentValue(...i.Period) i.CurrencyUnit {
 
 const generalPresentValueEndpoint = "/general-present-value"
 
-func TestInvestmentsServer(t *testing.T) {
+func TestInvestmentsRouter(t *testing.T) {
 	t.Run("test unknown path", func(t *testing.T) {
 		request, responseWriter := postRequestResponseWriterFactory(a.UrlPrefix+"/unknown-path", "")
-		server := &a.InvestmentsServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
-		server.ServeHTTP(responseWriter, request)
+		router := a.NewInvestmentsRouter(mockCalculateGeneralPresentValue)
+		router.ServeHTTP(responseWriter, request)
 		assertStatus(t, responseWriter, http.StatusNotFound)
 	})
 }
@@ -43,8 +43,8 @@ func TestPresentValueWithMock(t *testing.T) {
 			a.UrlPrefix+generalPresentValueEndpoint,
 			"{\"periods\": [{\"cashflow\": 1.0, \"interest\": 1.0}]}",
 		)
-		server := &a.InvestmentsServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
-		server.ServeHTTP(responseWriter, request)
+		router := a.NewInvestmentsRouter(mockCalculateGeneralPresentValue)
+		router.ServeHTTP(responseWriter, request)
 
 		got := responseWriter.Body.String()
 		expected := expectedResponseFromMockCalculateGeneratePresentValue
@@ -53,15 +53,15 @@ func TestPresentValueWithMock(t *testing.T) {
 
 	t.Run("test malformed request body", func(t *testing.T) {
 		request, responseWriter := postRequestResponseWriterFactory(a.UrlPrefix+generalPresentValueEndpoint, "{malformed}")
-		server := &a.InvestmentsServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
-		server.ServeHTTP(responseWriter, request)
+		router := a.NewInvestmentsRouter(mockCalculateGeneralPresentValue)
+		router.ServeHTTP(responseWriter, request)
 		assertStatus(t, responseWriter, http.StatusUnprocessableEntity)
 	})
 
 	t.Run("test wrong method", func(t *testing.T) {
 		request, _ := http.NewRequest(http.MethodGet, a.UrlPrefix+generalPresentValueEndpoint, strings.NewReader(""))
 		responseWriter := httptest.NewRecorder()
-		server := &a.InvestmentsServer{CalculateGeneralPresentValue: mockCalculateGeneralPresentValue}
+		server := a.NewInvestmentsRouter(mockCalculateGeneralPresentValue)
 		server.ServeHTTP(responseWriter, request)
 		assertStatus(t, responseWriter, http.StatusMethodNotAllowed)
 	})
@@ -69,12 +69,12 @@ func TestPresentValueWithMock(t *testing.T) {
 }
 
 func TestPresentValueIntegration(t *testing.T) {
-	server := a.ProductionInvestmentsServer
+	router := a.ProductionInvestmentsRouter
 	request, responseWriter := postRequestResponseWriterFactory(
 		a.UrlPrefix+generalPresentValueEndpoint,
 		"{\"periods\": [{\"cashflow\": 1.0, \"interest\": 1.0}]}",
 	)
-	server.ServeHTTP(responseWriter, request)
+	router.ServeHTTP(responseWriter, request)
 
 	got := responseWriter.Body.String()
 	expected := "{\"presentValue\":0.5}"
