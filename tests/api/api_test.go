@@ -28,3 +28,30 @@ func TestAssetPricingServer(t *testing.T) {
 		t.Errorf("expected call, didn't receive one")
 	}
 }
+
+func TestGetListenerPort(t *testing.T) {
+	assertPort := func(t *testing.T, got, want int) {
+		t.Helper()
+		if got != want {
+			t.Errorf("got %d, want %d", got, want)
+		}
+	}
+	t.Run("no alternatives", func(t *testing.T) {
+		got := api.GetListenerPort()
+		want := 8000
+		assertPort(t, got, want)
+	})
+	t.Run("with alternatives", func(t *testing.T) {
+		got := api.GetListenerPort("", "1234", "5678")
+		want := 1234
+		assertPort(t, got, want)
+	})
+
+}
+func TestGetListenerAddress(t *testing.T) {
+	got := api.GetListenerAddress()
+	want := ":8000"
+	if got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
+}
