@@ -2,5 +2,8 @@
     "azureFunctions.deploySubpath": "deployment",
     "azureFunctions.projectLanguage": "Custom",
     "azureFunctions.projectRuntime": "~4",
-    "debug.internalConsoleOptions": "neverOpen"
+    "debug.internalConsoleOptions": "neverOpen",
+    "cSpell.words": [
+        "xiasitao"
+    ]
 }
