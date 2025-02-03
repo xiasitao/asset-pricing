@@ -11,16 +11,16 @@ type InvestmentsRouter struct {
 	http.Handler
 }
 
-func NewInvestmentsRouter(calculateGeneralPresentValue func(...i.Period) i.CurrencyUnit) *InvestmentsRouter {
-	router := new(InvestmentsRouter)
+func NewInvestmentsRouter(prefix string, calculateGeneralPresentValue func(...i.Period) i.CurrencyUnit) *InvestmentsRouter {
+	router := InvestmentsRouter{}
 	router.CalculateGeneralPresentValue = calculateGeneralPresentValue
 	mux := http.NewServeMux()
-	mux.HandleFunc("/general-present-value", router.handleGeneralPresentValue)
+	mux.HandleFunc(prefix+"/general-present-value", router.handleGeneralPresentValue)
 	router.Handler = mux
-	return router
+	return &router
 }
 
-var ProductionInvestmentsRouter = NewInvestmentsRouter(i.CalculatePresentValue)
+var ProductionInvestmentsRouter = NewInvestmentsRouter("/investments", i.CalculatePresentValue)
 
 type GeneralPresentValueRequestBody struct {
 	Periods []i.Period `json:"periods"`

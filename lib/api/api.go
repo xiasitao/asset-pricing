@@ -8,8 +8,6 @@ import (
 	"strconv"
 )
 
-const UrlPrefix = ""
-
 type AssetPricingServer struct {
 	http.Handler
 }
