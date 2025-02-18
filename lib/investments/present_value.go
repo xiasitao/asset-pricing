@@ -1,5 +1,7 @@
 package investments
 
+import "math"
+
 type CurrencyUnit float64
 
 type Period struct {
@@ -7,8 +9,13 @@ type Period struct {
 	Interest float64      `json:"interest"`
 }
 
-func CalculatePerpetuityPesentValue(cashflow CurrencyUnit, interest float64) CurrencyUnit {
+func CalculatePerpetuityPresentValue(cashflow CurrencyUnit, interest float64) CurrencyUnit {
 	presentValue := CurrencyUnit(float64(cashflow) / interest)
+	return presentValue
+}
+
+func CalculateLumpSumPresentValue(lump CurrencyUnit, interest float64, periods int) CurrencyUnit {
+	presentValue := CurrencyUnit(float64(lump) / math.Pow(1+interest, float64(periods)))
 	return presentValue
 }
 

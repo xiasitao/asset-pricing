@@ -9,8 +9,15 @@ import (
 
 func TestPerpetuityPresentValue(t *testing.T) {
 	cashflow, interest := i.CurrencyUnit(1000.0), 0.2
-	got := i.CalculatePerpetuityPesentValue(cashflow, interest)
+	got := i.CalculatePerpetuityPresentValue(cashflow, interest)
 	expected := i.CurrencyUnit(1000.0 / 0.2)
+	assertPresentValue(t, got, expected)
+}
+
+func TestLumpSumPresentValue(t *testing.T) {
+	lump, interest, periods := i.CurrencyUnit(1000.0), 0.2, 5
+	got := i.CalculateLumpSumPresentValue(lump, interest, periods)
+	expected := i.CurrencyUnit(1000.0 / 1.2 / 1.2 / 1.2 / 1.2 / 1.2)
 	assertPresentValue(t, got, expected)
 }
 
