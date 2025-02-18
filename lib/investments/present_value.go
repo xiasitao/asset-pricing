@@ -19,12 +19,12 @@ func CalculateLumpSumPresentValue(lump CurrencyUnit, interest float64, periods i
 	return presentValue
 }
 
-func CalculateFinitePresentValue(cashflow CurrencyUnit, interest float64, periods int) CurrencyUnit {
+func CalculateAnnuityPresentValue(cashflow CurrencyUnit, interest float64, periods int) CurrencyUnit {
 	presentValue := CurrencyUnit(float64(cashflow) * (1 - math.Pow(1+interest, -float64(periods))) / interest)
 	return presentValue
 }
 
-func CalculateGeneralFinitePresentValue(periods ...Period) CurrencyUnit {
+func CalculateGeneralFiniteCashflowPresentValue(periods ...Period) CurrencyUnit {
 	if len(periods) == 0 {
 		return 0.0
 	}
@@ -35,7 +35,7 @@ func CalculateGeneralFinitePresentValue(periods ...Period) CurrencyUnit {
 	discountFactor := 1.0 / (1.0 + currentPeriod.Interest)
 
 	discountedCurrentPeriod := float64(currentPeriod.Cashflow) * discountFactor
-	discountedFuturePeriods := float64(CalculateGeneralFinitePresentValue(futurePeriods...)) * discountFactor
+	discountedFuturePeriods := float64(CalculateGeneralFiniteCashflowPresentValue(futurePeriods...)) * discountFactor
 
 	return CurrencyUnit(discountedCurrentPeriod + discountedFuturePeriods)
 }

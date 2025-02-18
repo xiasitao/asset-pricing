@@ -21,14 +21,14 @@ func TestLumpSumPresentValue(t *testing.T) {
 	assertPresentValue(t, got, expected)
 }
 
-func TestFinitePresentValue(t *testing.T) {
+func TestAnnuityPresentValue(t *testing.T) {
 	cashflow, interest, periods := i.CurrencyUnit(1000.0), 0.2, 5
-	got := i.CalculateFinitePresentValue(cashflow, interest, periods)
+	got := i.CalculateAnnuityPresentValue(cashflow, interest, periods)
 	expected := cashflow/1.2 + cashflow/1.2/1.2 + cashflow/1.2/1.2/1.2 + cashflow/1.2/1.2/1.2/1.2 + cashflow/1.2/1.2/1.2/1.2/1.2
 	assertPresentValue(t, got, expected)
 }
 
-func TestGeneralFinitePresentValue(t *testing.T) {
+func TestGeneralFiniteCashflowPresentValue(t *testing.T) {
 	type Case struct {
 		name     string
 		periods  []i.Period
@@ -71,7 +71,7 @@ func TestGeneralFinitePresentValue(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			got := i.CalculateGeneralFinitePresentValue(test.periods...)
+			got := i.CalculateGeneralFiniteCashflowPresentValue(test.periods...)
 			assertPresentValue(t, got, i.CurrencyUnit(test.expected))
 		})
 	}
