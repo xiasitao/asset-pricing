@@ -7,7 +7,7 @@ type Period struct {
 	Interest float64      `json:"interest"`
 }
 
-func CalculatePresentValue(periods ...Period) CurrencyUnit {
+func CalculateGeneralFinitePresentValue(periods ...Period) CurrencyUnit {
 	if len(periods) == 0 {
 		return 0.0
 	}
@@ -18,7 +18,7 @@ func CalculatePresentValue(periods ...Period) CurrencyUnit {
 	discountFactor := 1.0 / (1.0 + currentPeriod.Interest)
 
 	discountedCurrentPeriod := float64(currentPeriod.Cashflow) * discountFactor
-	discountedFuturePeriods := float64(CalculatePresentValue(futurePeriods...)) * discountFactor
+	discountedFuturePeriods := float64(CalculateGeneralFinitePresentValue(futurePeriods...)) * discountFactor
 
 	return CurrencyUnit(discountedCurrentPeriod + discountedFuturePeriods)
 }

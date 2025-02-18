@@ -20,7 +20,7 @@ func NewInvestmentsRouter(prefix string, calculateGeneralPresentValue func(...i.
 	return &router
 }
 
-var ProductionInvestmentsRouter = NewInvestmentsRouter("/investments", i.CalculatePresentValue)
+var ProductionInvestmentsRouter = NewInvestmentsRouter("/investments", i.CalculateGeneralFinitePresentValue)
 
 type GeneralPresentValueRequestBody struct {
 	Periods []i.Period `json:"periods"`

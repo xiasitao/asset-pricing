@@ -7,17 +7,7 @@ import (
 	i "xiasitao.de/asset-pricing/lib/investments"
 )
 
-func TestPresentValue(t *testing.T) {
-	assertPresentValue := func(t testing.TB, got, expected i.CurrencyUnit) {
-		t.Helper()
-		toFixedString := func(value i.CurrencyUnit) string {
-			return fmt.Sprintf("%.8f", value)
-		}
-		if toFixedString(got) != toFixedString(expected) {
-			t.Errorf("got %f, expected %f", got, expected)
-		}
-	}
-
+func TestGeneralFinitePresentValue(t *testing.T) {
 	type Case struct {
 		name     string
 		periods  []i.Period
@@ -60,8 +50,18 @@ func TestPresentValue(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			got := i.CalculatePresentValue(test.periods...)
+			got := i.CalculateGeneralFinitePresentValue(test.periods...)
 			assertPresentValue(t, got, i.CurrencyUnit(test.expected))
 		})
+	}
+}
+
+func assertPresentValue(t testing.TB, got, expected i.CurrencyUnit) {
+	t.Helper()
+	toFixedString := func(value i.CurrencyUnit) string {
+		return fmt.Sprintf("%.8f", value)
+	}
+	if toFixedString(got) != toFixedString(expected) {
+		t.Errorf("got %f, expected %f", got, expected)
 	}
 }
