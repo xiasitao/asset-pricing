@@ -26,12 +26,16 @@ var mockHandlers a.InvestmentsRouterHandlers = a.InvestmentsRouterHandlers{
 	PerpetuityPresentValue: func(cashflow i.CurrencyUnit, interest float64) i.CurrencyUnit {
 		return mockPresentValue
 	},
+	LumpSumPresentValue: func(lumpSum i.CurrencyUnit, interest float64, periods int) i.CurrencyUnit {
+		return mockPresentValue
+	},
 	GeneralFiniteCashflowPresentValue: func(...i.Period) i.CurrencyUnit {
 		return mockPresentValue
 	},
 }
 
-const perpetuityEndpoint = "/perpetuity-present-value"
+const perpetuityPresentValueEndpoint = "/perpetuity-present-value"
+const lumpSumPresentValueEndpoint = "/lump-sum-present-value"
 const generalFiniteCashflowPresentValueEndpoint = "/general-finite-cashflow-present-value"
 
 func TestInvestmentsRouter(t *testing.T) {
@@ -83,16 +87,21 @@ func TestPresentValueWithMock(t *testing.T) {
 		assertResponseBody(t, got, expected)
 	}
 
+	t.Run("perpetuity", func(t *testing.T) {
+		testMethod(t, perpetuityPresentValueEndpoint)
+		testEndpointResponse(t, perpetuityPresentValueEndpoint, a.PerpetuityPresentValueRequestBody{Cashflow: 1.0, Interest: 1.0})
+	})
+
+	t.Run("lump sum", func(t *testing.T) {
+		testMethod(t, lumpSumPresentValueEndpoint)
+		testEndpointResponse(t, lumpSumPresentValueEndpoint, a.LumpSumPresentValueRequestBody{Lump: 1.0, Interest: 1.0, Periods: 5})
+	})
+
 	t.Run("general finite cashflow", func(t *testing.T) {
 		testMethod(t, generalFiniteCashflowPresentValueEndpoint)
 		testEndpointResponse(t, generalFiniteCashflowPresentValueEndpoint,
 			a.GeneralFiniteCashflowPresentValueRequestBody{Periods: []i.Period{{Cashflow: 1.0, Interest: 1.0}}},
 		)
-	})
-
-	t.Run("perpetuity", func(t *testing.T) {
-		testMethod(t, perpetuityEndpoint)
-		testEndpointResponse(t, perpetuityEndpoint, a.PerpetuityPresentValueRequestBody{Cashflow: 1.0, Interest: 1.0})
 	})
 
 }
