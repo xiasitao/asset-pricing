@@ -7,20 +7,27 @@ import (
 )
 
 type InvestmentsRouter struct {
-	CalculateGeneralPresentValue func(...i.Period) i.CurrencyUnit
+	handlers InvestmentsRouterHandlers
 	http.Handler
 }
 
-func NewInvestmentsRouter(prefix string, calculateGeneralFiniteCashflowPresentValue func(...i.Period) i.CurrencyUnit) *InvestmentsRouter {
+type InvestmentsRouterHandlers struct {
+	GeneralFiniteCashflowPresentValue func(...i.Period) i.CurrencyUnit
+}
+
+func NewInvestmentsRouter(prefix string, handlers InvestmentsRouterHandlers) *InvestmentsRouter {
 	router := InvestmentsRouter{}
-	router.CalculateGeneralPresentValue = calculateGeneralFiniteCashflowPresentValue
+	router.handlers = handlers
 	mux := http.NewServeMux()
 	mux.HandleFunc(prefix+"/general-finite-cashflow-present-value", router.handleGeneralFiniteCashflowPresentValue)
 	router.Handler = mux
 	return &router
 }
 
-var ProductionInvestmentsRouter = NewInvestmentsRouter("/investments", i.CalculateGeneralFiniteCashflowPresentValue)
+var productionHandlers InvestmentsRouterHandlers = InvestmentsRouterHandlers{
+	GeneralFiniteCashflowPresentValue: i.CalculateGeneralFiniteCashflowPresentValue,
+}
+var ProductionInvestmentsRouter = NewInvestmentsRouter("/investments", productionHandlers)
 
 type GeneralFiniteCashflowPresentValueRequestBody struct {
 	Periods []i.Period `json:"periods"`
@@ -40,6 +47,6 @@ func (pvs *InvestmentsRouter) handleGeneralFiniteCashflowPresentValue(responseWr
 	if err != nil {
 		return
 	}
-	presentValue := pvs.CalculateGeneralPresentValue(body.Periods...)
+	presentValue := pvs.handlers.GeneralFiniteCashflowPresentValue(body.Periods...)
 	WriteResponseBody(responseWriter, PresentValueResponseBody{presentValue})
 }
