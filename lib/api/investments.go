@@ -14,6 +14,7 @@ type InvestmentsRouter struct {
 type InvestmentsRouterHandlers struct {
 	PerpetuityPresentValue            func(cashflow i.CurrencyUnit, interest float64) i.CurrencyUnit
 	LumpSumPresentValue               func(lump i.CurrencyUnit, interest float64, periods int) i.CurrencyUnit
+	AnnuityPresentValue               func(cashflow i.CurrencyUnit, interest float64, periods int) i.CurrencyUnit
 	GeneralFiniteCashflowPresentValue func(...i.Period) i.CurrencyUnit
 }
 
@@ -23,6 +24,7 @@ func NewInvestmentsRouter(prefix string, handlers InvestmentsRouterHandlers) *In
 	mux := http.NewServeMux()
 	mux.HandleFunc(prefix+"/perpetuity-present-value", router.handlePerpetuityPresentValue)
 	mux.HandleFunc(prefix+"/lump-sum-present-value", router.handleLumpSumPresentValue)
+	mux.HandleFunc(prefix+"/annuity-present-value", router.handleAnnuityPresentValue)
 	mux.HandleFunc(prefix+"/general-finite-cashflow-present-value", router.handleGeneralFiniteCashflowPresentValue)
 	router.Handler = mux
 	return &router
@@ -72,6 +74,26 @@ func (ir *InvestmentsRouter) handleLumpSumPresentValue(responseWriter http.Respo
 		return
 	}
 	presentValue := ir.handlers.LumpSumPresentValue(body.Lump, body.Interest, body.Periods)
+	WriteResponseBody(responseWriter, PresentValueResponseBody{presentValue})
+}
+
+type AnnuityPresentValueRequestBody struct {
+	Cashflow i.CurrencyUnit
+	Interest float64
+	Periods  int
+}
+
+func (ir *InvestmentsRouter) handleAnnuityPresentValue(responseWriter http.ResponseWriter, request *http.Request) {
+	if request.Method != http.MethodPost {
+		responseWriter.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	var body AnnuityPresentValueRequestBody
+	err := ReadRequestBody(&body, responseWriter, request)
+	if err != nil {
+		return
+	}
+	presentValue := ir.handlers.AnnuityPresentValue(body.Cashflow, body.Interest, body.Periods)
 	WriteResponseBody(responseWriter, PresentValueResponseBody{presentValue})
 }
 
