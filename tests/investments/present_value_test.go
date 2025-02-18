@@ -7,17 +7,28 @@ import (
 	i "xiasitao.de/asset-pricing/lib/investments"
 )
 
-func TestPresentValue(t *testing.T) {
-	assertPresentValue := func(t testing.TB, got, expected i.CurrencyUnit) {
-		t.Helper()
-		toFixedString := func(value i.CurrencyUnit) string {
-			return fmt.Sprintf("%.8f", value)
-		}
-		if toFixedString(got) != toFixedString(expected) {
-			t.Errorf("got %f, expected %f", got, expected)
-		}
-	}
+func TestPerpetuityPresentValue(t *testing.T) {
+	cashflow, interest := i.CurrencyUnit(1000.0), 0.2
+	got := i.CalculatePerpetuityPresentValue(cashflow, interest)
+	expected := i.CurrencyUnit(1000.0 / 0.2)
+	assertPresentValue(t, got, expected)
+}
 
+func TestLumpSumPresentValue(t *testing.T) {
+	lump, interest, periods := i.CurrencyUnit(1000.0), 0.2, 5
+	got := i.CalculateLumpSumPresentValue(lump, interest, periods)
+	expected := i.CurrencyUnit(1000.0 / 1.2 / 1.2 / 1.2 / 1.2 / 1.2)
+	assertPresentValue(t, got, expected)
+}
+
+func TestAnnuityPresentValue(t *testing.T) {
+	cashflow, interest, periods := i.CurrencyUnit(1000.0), 0.2, 5
+	got := i.CalculateAnnuityPresentValue(cashflow, interest, periods)
+	expected := cashflow/1.2 + cashflow/1.2/1.2 + cashflow/1.2/1.2/1.2 + cashflow/1.2/1.2/1.2/1.2 + cashflow/1.2/1.2/1.2/1.2/1.2
+	assertPresentValue(t, got, expected)
+}
+
+func TestGeneralFiniteCashflowPresentValue(t *testing.T) {
 	type Case struct {
 		name     string
 		periods  []i.Period
@@ -60,8 +71,18 @@ func TestPresentValue(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			got := i.CalculatePresentValue(test.periods...)
+			got := i.CalculateGeneralFiniteCashflowPresentValue(test.periods...)
 			assertPresentValue(t, got, i.CurrencyUnit(test.expected))
 		})
+	}
+}
+
+func assertPresentValue(t testing.TB, got, expected i.CurrencyUnit) {
+	t.Helper()
+	toFixedString := func(value i.CurrencyUnit) string {
+		return fmt.Sprintf("%.8f", value)
+	}
+	if toFixedString(got) != toFixedString(expected) {
+		t.Errorf("got %f, expected %f", got, expected)
 	}
 }

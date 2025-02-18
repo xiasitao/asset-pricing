@@ -1,5 +1,7 @@
 package investments
 
+import "math"
+
 type CurrencyUnit float64
 
 type Period struct {
@@ -7,7 +9,22 @@ type Period struct {
 	Interest float64      `json:"interest"`
 }
 
-func CalculatePresentValue(periods ...Period) CurrencyUnit {
+func CalculatePerpetuityPresentValue(cashflow CurrencyUnit, interest float64) CurrencyUnit {
+	presentValue := CurrencyUnit(float64(cashflow) / interest)
+	return presentValue
+}
+
+func CalculateLumpSumPresentValue(lump CurrencyUnit, interest float64, periods int) CurrencyUnit {
+	presentValue := CurrencyUnit(float64(lump) / math.Pow(1+interest, float64(periods)))
+	return presentValue
+}
+
+func CalculateAnnuityPresentValue(cashflow CurrencyUnit, interest float64, periods int) CurrencyUnit {
+	presentValue := CurrencyUnit(float64(cashflow) * (1 - math.Pow(1+interest, -float64(periods))) / interest)
+	return presentValue
+}
+
+func CalculateGeneralFiniteCashflowPresentValue(periods ...Period) CurrencyUnit {
 	if len(periods) == 0 {
 		return 0.0
 	}
@@ -18,7 +35,7 @@ func CalculatePresentValue(periods ...Period) CurrencyUnit {
 	discountFactor := 1.0 / (1.0 + currentPeriod.Interest)
 
 	discountedCurrentPeriod := float64(currentPeriod.Cashflow) * discountFactor
-	discountedFuturePeriods := float64(CalculatePresentValue(futurePeriods...)) * discountFactor
+	discountedFuturePeriods := float64(CalculateGeneralFiniteCashflowPresentValue(futurePeriods...)) * discountFactor
 
 	return CurrencyUnit(discountedCurrentPeriod + discountedFuturePeriods)
 }

@@ -1,0 +1,7 @@
+POST https://asset-pricing-api--8g8mjxy.jollysmoke-0e76feec.germanywestcentral.azurecontainerapps.io//general-present-value
+
+{
+    "periods": [
+        {"cashflow": 123, "interest": 0.1}
+    ]
+}
