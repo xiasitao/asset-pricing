@@ -19,6 +19,11 @@ func CalculateLumpSumPresentValue(lump CurrencyUnit, interest float64, periods i
 	return presentValue
 }
 
+func CalculateFinitePresentValue(cashflow CurrencyUnit, interest float64, periods int) CurrencyUnit {
+	presentValue := CurrencyUnit(float64(cashflow) * (1 - math.Pow(1+interest, -float64(periods))) / interest)
+	return presentValue
+}
+
 func CalculateGeneralFinitePresentValue(periods ...Period) CurrencyUnit {
 	if len(periods) == 0 {
 		return 0.0
