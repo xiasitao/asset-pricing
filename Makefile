@@ -6,7 +6,7 @@ run:
 	@cd deployment/docker-compose && docker compose up --build
 
 push-image:
-	@docker compose build
+	@cd deployment/docker-compose && docker compose build
 	@docker tag asset-pricing-api:latest xiasitao/asset-pricing-api:latest
 	@docker push xiasitao/asset-pricing-api:latest
 
