@@ -115,21 +115,64 @@ func TestPresentValueWithMock(t *testing.T) {
 
 }
 
-func TestGeneralFiniteCashflowPresentValueIntegration(t *testing.T) {
-	requestBodyBuffer := strings.Builder{}
-	json.NewEncoder(&requestBodyBuffer).Encode(a.GeneralFiniteCashflowPresentValueRequestBody{Periods: []i.Period{{Cashflow: 1.0, Interest: 1.0}}})
+func TestProductionInvestmentsRouterIntegration(t *testing.T) {
+	testEndpointResponse := func(t *testing.T, endpoint string, requestBody any, expectedResponseBody a.PresentValueResponseBody) {
+		t.Helper()
+		requestBodyBuffer := strings.Builder{}
+		json.NewEncoder(&requestBodyBuffer).Encode(requestBody)
 
-	request, responseWriter := postRequestResponseWriterFactory(
-		"/investments"+generalFiniteCashflowPresentValueEndpoint,
-		requestBodyBuffer.String(),
-	)
-	a.ProductionInvestmentsRouter.ServeHTTP(responseWriter, request)
+		request, responseWriter := postRequestResponseWriterFactory(
+			"/investments"+endpoint,
+			requestBodyBuffer.String(),
+		)
+		a.ProductionInvestmentsRouter.ServeHTTP(responseWriter, request)
 
-	got := a.PresentValueResponseBody{}
-	json.NewDecoder(responseWriter.Body).Decode(&got)
-	expected := a.PresentValueResponseBody{PresentValue: 0.5}
-	assertStatus(t, responseWriter, http.StatusOK)
-	assertResponseBody(t, got, expected)
+		got := a.PresentValueResponseBody{}
+		json.NewDecoder(responseWriter.Body).Decode(&got)
+		assertStatus(t, responseWriter, http.StatusOK)
+		assertResponseBody(t, got, expectedResponseBody)
+	}
+
+	t.Run("perpetuity", func(t *testing.T) {
+		requestBody := a.PerpetuityPresentValueRequestBody{
+			Cashflow: 1.0, Interest: 0.2,
+		}
+		expectedResponseBody := a.PresentValueResponseBody{
+			PresentValue: 5.0,
+		}
+		testEndpointResponse(t, perpetuityPresentValueEndpoint, requestBody, expectedResponseBody)
+	})
+
+	t.Run("lump sum", func(t *testing.T) {
+		requestBody := a.LumpSumPresentValueRequestBody{
+			Lump:     1000.0,
+			Interest: 0.2,
+			Periods:  5,
+		}
+		expectedResponseBody := a.PresentValueResponseBody{
+			PresentValue: 1000.0 / 1.2 / 1.2 / 1.2 / 1.2 / 1.2,
+		}
+		testEndpointResponse(t, lumpSumPresentValueEndpoint, requestBody, expectedResponseBody)
+	})
+
+	t.Run("annuity", func(t *testing.T) {
+		requestBody := a.AnnuityPresentValueRequestBody{
+			Cashflow: 1.0,
+			Interest: 0.2,
+			Periods:  5,
+		}
+		expectedResponseBody := a.PresentValueResponseBody{
+			PresentValue: 1.0 * (1 - 1/1.2/1.2/1.2/1.2/1.2) / 0.2,
+		}
+		testEndpointResponse(t, annuityPresentValueEndpoint, requestBody, expectedResponseBody)
+	})
+
+	t.Run("general finite cashflow", func(t *testing.T) {
+		requestBody := a.GeneralFiniteCashflowPresentValueRequestBody{Periods: []i.Period{{Cashflow: 1.0, Interest: 1.0}}}
+		expectedResponseBody := a.PresentValueResponseBody{PresentValue: 0.5}
+		testEndpointResponse(t, generalFiniteCashflowPresentValueEndpoint, requestBody, expectedResponseBody)
+	})
+
 }
 
 func assertStatus(t testing.TB, responseWriter *httptest.ResponseRecorder, expected int) {

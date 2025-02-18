@@ -31,6 +31,9 @@ func NewInvestmentsRouter(prefix string, handlers InvestmentsRouterHandlers) *In
 }
 
 var productionHandlers InvestmentsRouterHandlers = InvestmentsRouterHandlers{
+	PerpetuityPresentValue:            i.CalculatePerpetuityPresentValue,
+	LumpSumPresentValue:               i.CalculateLumpSumPresentValue,
+	AnnuityPresentValue:               i.CalculateAnnuityPresentValue,
 	GeneralFiniteCashflowPresentValue: i.CalculateGeneralFiniteCashflowPresentValue,
 }
 var ProductionInvestmentsRouter = NewInvestmentsRouter("/investments", productionHandlers)
