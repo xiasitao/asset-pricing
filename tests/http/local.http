@@ -1,0 +1,36 @@
+POST http://host.docker.internal:8080/investments/perpetuity-present-value
+
+{
+    "cashflow": 123,
+    "interest": 0.2
+}
+
+###
+
+POST http://host.docker.internal:8080/investments/lump-sum-present-value
+
+{
+    "lump": 123,
+    "interest": 0.2,
+    "periods": 5
+}
+
+###
+
+POST http://host.docker.internal:8080/investments/annuity-present-value
+
+{
+    "cashflow": 123,
+    "interest": 0.2,
+    "periods": 5
+}
+
+###
+
+POST http://host.docker.internal:8080/investments/general-finite-cashflow-present-value
+
+{
+    "periods": [
+        {"cashflow": 123, "interest": 0.2}
+    ]
+}
