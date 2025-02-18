@@ -11,35 +11,35 @@ type InvestmentsRouter struct {
 	http.Handler
 }
 
-func NewInvestmentsRouter(prefix string, calculateGeneralPresentValue func(...i.Period) i.CurrencyUnit) *InvestmentsRouter {
+func NewInvestmentsRouter(prefix string, calculateGeneralFiniteCashflowPresentValue func(...i.Period) i.CurrencyUnit) *InvestmentsRouter {
 	router := InvestmentsRouter{}
-	router.CalculateGeneralPresentValue = calculateGeneralPresentValue
+	router.CalculateGeneralPresentValue = calculateGeneralFiniteCashflowPresentValue
 	mux := http.NewServeMux()
-	mux.HandleFunc(prefix+"/general-present-value", router.handleGeneralPresentValue)
+	mux.HandleFunc(prefix+"/general-finite-cashflow-present-value", router.handleGeneralFiniteCashflowPresentValue)
 	router.Handler = mux
 	return &router
 }
 
 var ProductionInvestmentsRouter = NewInvestmentsRouter("/investments", i.CalculateGeneralFiniteCashflowPresentValue)
 
-type GeneralPresentValueRequestBody struct {
+type GeneralFiniteCashflowPresentValueRequestBody struct {
 	Periods []i.Period `json:"periods"`
 }
 
-type GeneralPresentValueResponseBody struct {
+type GeneralFiniteCashflowPresentValueResponseBody struct {
 	PresentValue i.CurrencyUnit `json:"presentValue"`
 }
 
-func (pvs *InvestmentsRouter) handleGeneralPresentValue(responseWriter http.ResponseWriter, request *http.Request) {
+func (pvs *InvestmentsRouter) handleGeneralFiniteCashflowPresentValue(responseWriter http.ResponseWriter, request *http.Request) {
 	if request.Method != http.MethodPost {
 		responseWriter.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-	var body GeneralPresentValueRequestBody
+	var body GeneralFiniteCashflowPresentValueRequestBody
 	err := ReadRequestBody(&body, responseWriter, request)
 	if err != nil {
 		return
 	}
 	presentValue := pvs.CalculateGeneralPresentValue(body.Periods...)
-	WriteResponseBody(responseWriter, GeneralPresentValueResponseBody{presentValue})
+	WriteResponseBody(responseWriter, GeneralFiniteCashflowPresentValueResponseBody{presentValue})
 }
