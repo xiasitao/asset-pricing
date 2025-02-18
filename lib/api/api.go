@@ -20,7 +20,7 @@ func NewAssetPricingServer(investmentsRouter http.Handler) *AssetPricingServer {
 	return server
 }
 
-func ReadRequestBody(body *GeneralFiniteCashflowPresentValueRequestBody, responseWriter http.ResponseWriter, request *http.Request) error {
+func ReadRequestBody(body any, responseWriter http.ResponseWriter, request *http.Request) error {
 	err := json.NewDecoder(request.Body).Decode(&body)
 	if err != nil {
 		responseWriter.WriteHeader(http.StatusUnprocessableEntity)
