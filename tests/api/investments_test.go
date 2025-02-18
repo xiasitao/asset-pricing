@@ -20,7 +20,7 @@ func postRequestResponseWriterFactory(path string, body string) (request *http.R
 
 const mockPresentValue investments.CurrencyUnit = 123.5
 
-var expectedResponseFromMockCalculateGeneralFiniteCashflowPresentValue = api.GeneralFiniteCashflowPresentValueResponseBody{PresentValue: investments.CurrencyUnit(mockPresentValue)}
+var expectedResponseFromMockCalculateGeneralFiniteCashflowPresentValue = api.PresentValueResponseBody{PresentValue: investments.CurrencyUnit(mockPresentValue)}
 
 func mockCalculateGeneralFiniteCashflowPresentValue(...investments.Period) investments.CurrencyUnit {
 	return mockPresentValue
@@ -70,7 +70,7 @@ func TestPresentValueWithMock(t *testing.T) {
 		router := api.NewInvestmentsRouter("", mockCalculateGeneralFiniteCashflowPresentValue)
 		router.ServeHTTP(responseWriter, request)
 
-		got := api.GeneralFiniteCashflowPresentValueResponseBody{}
+		got := api.PresentValueResponseBody{}
 		json.NewDecoder(responseWriter.Body).Decode(&got)
 		expected := expectedResponseFromMockCalculateGeneralFiniteCashflowPresentValue
 		assertResponseBody(t, got, expected)
@@ -88,9 +88,9 @@ func TestPresentValueIntegration(t *testing.T) {
 	)
 	api.ProductionInvestmentsRouter.ServeHTTP(responseWriter, request)
 
-	got := api.GeneralFiniteCashflowPresentValueResponseBody{}
+	got := api.PresentValueResponseBody{}
 	json.NewDecoder(responseWriter.Body).Decode(&got)
-	expected := api.GeneralFiniteCashflowPresentValueResponseBody{PresentValue: 0.5}
+	expected := api.PresentValueResponseBody{PresentValue: 0.5}
 	assertStatus(t, responseWriter, http.StatusOK)
 	assertResponseBody(t, got, expected)
 }
@@ -103,7 +103,7 @@ func assertStatus(t testing.TB, responseWriter *httptest.ResponseRecorder, expec
 	}
 }
 
-func assertResponseBody(t testing.TB, got, expected api.GeneralFiniteCashflowPresentValueResponseBody) {
+func assertResponseBody(t testing.TB, got, expected api.PresentValueResponseBody) {
 	t.Helper()
 	if !reflect.DeepEqual(got, expected) {
 		t.Errorf("got %v, expected %v", got, expected)

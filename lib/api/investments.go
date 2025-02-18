@@ -26,7 +26,7 @@ type GeneralFiniteCashflowPresentValueRequestBody struct {
 	Periods []i.Period `json:"periods"`
 }
 
-type GeneralFiniteCashflowPresentValueResponseBody struct {
+type PresentValueResponseBody struct {
 	PresentValue i.CurrencyUnit `json:"presentValue"`
 }
 
@@ -41,5 +41,5 @@ func (pvs *InvestmentsRouter) handleGeneralFiniteCashflowPresentValue(responseWr
 		return
 	}
 	presentValue := pvs.CalculateGeneralPresentValue(body.Periods...)
-	WriteResponseBody(responseWriter, GeneralFiniteCashflowPresentValueResponseBody{presentValue})
+	WriteResponseBody(responseWriter, PresentValueResponseBody{presentValue})
 }
