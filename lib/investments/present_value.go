@@ -7,6 +7,11 @@ type Period struct {
 	Interest float64      `json:"interest"`
 }
 
+func CalculatePerpetuityPesentValue(cashflow CurrencyUnit, interest float64) CurrencyUnit {
+	presentValue := CurrencyUnit(float64(cashflow) / interest)
+	return presentValue
+}
+
 func CalculateGeneralFinitePresentValue(periods ...Period) CurrencyUnit {
 	if len(periods) == 0 {
 		return 0.0

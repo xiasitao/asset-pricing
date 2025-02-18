@@ -7,6 +7,13 @@ import (
 	i "xiasitao.de/asset-pricing/lib/investments"
 )
 
+func TestPerpetuityPresentValue(t *testing.T) {
+	cashflow, interest := i.CurrencyUnit(1000.0), 0.2
+	got := i.CalculatePerpetuityPesentValue(cashflow, interest)
+	expected := i.CurrencyUnit(1000.0 / 0.2)
+	assertPresentValue(t, got, expected)
+}
+
 func TestGeneralFinitePresentValue(t *testing.T) {
 	type Case struct {
 		name     string
